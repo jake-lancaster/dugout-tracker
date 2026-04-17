@@ -823,7 +823,6 @@ function RosterTab({ players }) {
 // ─── Rotation Tab ───
 function RotationTab({ players, rotation, setRotation }) {
   const [selectedCell, setSelectedCell] = useState(null);
-  const [selectedCell, setSelectedCell] = useState(null);
   const getPlayer = (pos, inning) => rotation[`${pos}-${inning}`] || "";
   const setPlayer = (pos, inning, pid) => { setRotation({ ...rotation, [`${pos}-${inning}`]: pid }); setSelectedCell(null); };
   const usedInInning = (inning) => { const u = []; POSITIONS.forEach(pos => { const p = getPlayer(pos, inning); if (p) u.push(p); }); return u; };
