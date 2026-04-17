@@ -23,17 +23,19 @@ const FIELD_GRADE_LABELS = { "\u2713": "Routine", "\u2605": "Great", "X": "Error
 // ─── Storage with robust save/load ───
 const STORAGE_KEY = "cpbt-all-data-v2";
 
-function loadAllData() {
+async function loadAllData() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    const result = await window.storage.get(STORAGE_KEY);
+    if (result && result.value) {
+      return JSON.parse(result.value);
+    }
   } catch (e) { console.error("Load failed:", e); }
   return null;
 }
 
-function saveAllData(data) {
+async function saveAllData(data) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    await window.storage.set(STORAGE_KEY, JSON.stringify(data));
   } catch (e) { console.error("Save failed:", e); }
 }
 
@@ -819,8 +821,8 @@ function RosterTab({ players }) {
 }
 
 // ─── Rotation Tab ───
-function RotationTab({ players }) {
-  const [rotation, setRotation] = useState({});
+function RotationTab({ players, rotation, setRotation }) {
+  const [selectedCell, setSelectedCell] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
   const getPlayer = (pos, inning) => rotation[`${pos}-${inning}`] || "";
   const setPlayer = (pos, inning, pid) => { setRotation({ ...rotation, [`${pos}-${inning}`]: pid }); setSelectedCell(null); };
@@ -891,17 +893,23 @@ export default function App() {
   const [tab, setTab] = useState("gameday");
   const [players, setPlayers] = useState(PLAYERS_INIT);
   const [games, setGames] = useState([]);
+  const [rotation, setRotation] = useState({});
   const [loaded, setLoaded] = useState(false);
   const saveTimeout = useRef(null);
 
   // Load once on mount
   useEffect(() => {
-    const data = loadAllData();
-    if (data) {
-      setGames(data.games || []);
-      setPlayers(data.players || PLAYERS_INIT);
-    }
-    setLoaded(true);
+    let cancelled = false;
+    loadAllData().then(data => {
+      if (cancelled) return;
+      if (data) {
+        setGames(data.games || []);
+        setPlayers(data.players || PLAYERS_INIT);
+        setRotation(data.rotation || {});
+      }
+      setLoaded(true);
+    });
+    return () => { cancelled = true; };
   }, []);
 
   // Save on every change, debounced, only after initial load
@@ -909,10 +917,10 @@ export default function App() {
     if (!loaded) return;
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
     saveTimeout.current = setTimeout(() => {
-      saveAllData({ games, players });
+      saveAllData({ games, players, rotation });
     }, 300);
     return () => { if (saveTimeout.current) clearTimeout(saveTimeout.current); };
-  }, [games, players, loaded]);
+  }, [games, players, rotation, loaded]);
 
   if (!loaded) {
     return (
@@ -948,7 +956,7 @@ export default function App() {
           {tab === "gameday" && <GameDayTab games={games} setGames={setGames} players={players} />}
           {tab === "season" && <SeasonTab games={games} players={players} />}
           {tab === "roster" && <RosterTab players={players} />}
-          {tab === "rotation" && <RotationTab players={players} />}
+          {tab === "rotation" && <RotationTab players={players} rotation={rotation} setRotation={setRotation} />}
         </div>
         <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "var(--card)", borderTop: "1px solid var(--border)",
           display: "flex", justifyContent: "center", zIndex: 100 }}>
