@@ -1,0 +1,74 @@
+# Dugout Tracker
+
+Coach Pitch baseball stats & rotation tracker. Built for 8U rec league.
+
+## Features
+
+- **Game Day**: Track at-bats, fielding grades, and game notes in real time
+- **Lineup Editor**: Reorder batting lineup with tap controls, mark players absent
+- **Fielding Tracker**: Assign positions and grade performance per inning
+- **Game Summary**: Post-game stats with next-game recommendations (batting order changes, fielding notes, sit fairness)
+- **Season Stats**: Aggregated batting averages, fielding grades, and position history
+- **Rotation Planner**: Build defensive rotations with conflict detection
+- **PWA**: Install on phone home screen, works offline
+
+## Deploy to Vercel
+
+### Option A: GitHub + Vercel (recommended)
+
+1. Create a new repo on GitHub:
+   ```
+   cd dugout-tracker
+   git init
+   git add .
+   git commit -m "initial commit"
+   git remote add origin https://github.com/YOUR_USERNAME/dugout-tracker.git
+   git push -u origin main
+   ```
+
+2. Go to [vercel.com](https://vercel.com), click "New Project"
+
+3. Import the GitHub repo
+
+4. Vercel auto-detects Vite — just click Deploy
+
+5. You'll get a URL like `dugout-tracker.vercel.app`
+
+### Option B: Vercel CLI
+
+```bash
+npm install -g vercel
+cd dugout-tracker
+npm install
+vercel
+```
+
+## Add to Phone Home Screen
+
+### iPhone (Safari)
+1. Open your Vercel URL in Safari
+2. Tap the Share button (box with arrow)
+3. Tap "Add to Home Screen"
+4. Name it "Dugout" and tap Add
+
+### Android (Chrome)
+1. Open your Vercel URL in Chrome
+2. Tap the three-dot menu
+3. Tap "Add to Home screen"
+
+## Local Development
+
+```bash
+npm install
+npm run dev
+```
+
+Opens at `http://localhost:5173`
+
+## Data Storage
+
+Currently uses localStorage (data stays on each device). All coaches can use the app but each phone keeps its own data.
+
+## Roster
+
+Pre-loaded with the current team roster and optimized batting order.
